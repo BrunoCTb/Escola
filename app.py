@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 import sqlite3
 
 
@@ -64,8 +65,27 @@ class Application:
 
         self.submit = Button(self.root, text="Enviar", command=self.saveUser).pack()
 
+        self.newWindow = Button(self.root, text="Mostrar usuários", command=self.showUsers).pack()
+
     def saveUser(self):
         self.db.insert(self.name.get(), self.email.get(), self.rgm.get(), self.password.get())
+
+    def showUsers(self):
+        self.rootUsers = Toplevel()
+        self.rootUsers
+
+        table = ttk.Treeview(self.rootUsers, columns=("ID", "Nome", "Email", "RGM"))
+        table.heading("#0", text="ID",)
+        table.heading("#1", text="Nome")
+        table.heading("#2", text="Email")
+        table.heading("#3", text="RGM")
+
+        users = self.db.getUsers()
+        
+        for user in users:
+            table.insert("", "end", text=user[0], values=(user[1], user[2], user[3]))
+
+        table.pack(expand=True, fill="both")
 
 
 def app():
