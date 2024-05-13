@@ -1,4 +1,5 @@
 from tkinter import *
+import sqlite3
 
 
 class Front:
@@ -34,11 +35,38 @@ class Front:
         self.submit = Button(self.root, text="Enviar").pack()
 
 
+class Database:
+    def __init__(self):
+        self.conn = sqlite3.connect("escola.db")
+        self.cursor = self.conn.cursor()
+        
+    def createTable(self):
+        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS users(
+                            id INTEGER PRIMARY KEY, 
+                            nome TEXT, 
+                            email TEXT, 
+                            rgm INTEGER, 
+                            senha TEXT);
+        ''')
+        self.conn.commit()
+
+    def insert(self, name, email, rgm, password):
+        self.cursor.execute(''' INSERT INTO users (nome, email, rgm, senha)
+                          VALUES (?, ?, ?, ?); ''', (name, email, rgm, password))
+        self.conn.commit()
+                          
+
+    def getUsers(self):
+        return self.conn.execute("SELECT * FROM users")
+    
+    def closeConnection(self):
+        self.cursor.close()
+
 
 def app():
     root = Tk()
     Front(root)
     root.mainloop()
 
-app()
+# app()
         
