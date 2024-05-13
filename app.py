@@ -2,9 +2,39 @@ from tkinter import *
 import sqlite3
 
 
-class Front:
+class Database:
+    def __init__(self):
+        self.conn = sqlite3.connect("escola.db")
+        self.cursor = self.conn.cursor()
+        self.createTable()
+        
+    def createTable(self):
+        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS users(
+                            id INTEGER PRIMARY KEY, 
+                            nome TEXT, 
+                            email TEXT, 
+                            rgm INTEGER, 
+                            senha TEXT);
+        ''')
+        self.conn.commit()
+
+    def insert(self, name, email, rgm, password):
+        self.cursor.execute(''' INSERT INTO users (nome, email, rgm, senha)
+                          VALUES (?, ?, ?, ?); ''', (name, email, rgm, password))
+        self.conn.commit()
+                          
+
+    def getUsers(self):
+        return self.conn.execute("SELECT * FROM users")
+    
+    def closeConnection(self):
+        self.cursor.close()
+
+
+class Application:
     def __init__(self, master):
         self.root = master
+        self.db = Database()
         self.windowConfig()
         self.widgetsConfig()
 
@@ -32,41 +62,18 @@ class Front:
         self.confirm = Entry(self.root)
         self.confirm.pack()
 
-        self.submit = Button(self.root, text="Enviar").pack()
+        self.submit = Button(self.root, text="Enviar", command=self.saveUser).pack()
 
-
-class Database:
-    def __init__(self):
-        self.conn = sqlite3.connect("escola.db")
-        self.cursor = self.conn.cursor()
-        
-    def createTable(self):
-        self.cursor.execute(''' CREATE TABLE IF NOT EXISTS users(
-                            id INTEGER PRIMARY KEY, 
-                            nome TEXT, 
-                            email TEXT, 
-                            rgm INTEGER, 
-                            senha TEXT);
-        ''')
-        self.conn.commit()
-
-    def insert(self, name, email, rgm, password):
-        self.cursor.execute(''' INSERT INTO users (nome, email, rgm, senha)
-                          VALUES (?, ?, ?, ?); ''', (name, email, rgm, password))
-        self.conn.commit()
-                          
-
-    def getUsers(self):
-        return self.conn.execute("SELECT * FROM users")
-    
-    def closeConnection(self):
-        self.cursor.close()
+    def saveUser(self):
+        self.db.insert(self.name.get(), self.email.get(), self.rgm.get(), self.password.get())
 
 
 def app():
     root = Tk()
-    Front(root)
+    Application(root)
     root.mainloop()
 
-# app()
+
+if __name__ == "__main__":
+    app()
         
